@@ -222,6 +222,106 @@ function makeShopifyRequest(pathQuery) {
   });
 }
 
+// OTP store cache (in-memory)
+const otpStore = {};
+
+// Endpoint: Generate and Send OTP
+app.post('/api/auth/send-otp', (req, res) => {
+  const { phone } = req.body;
+  const cleanPhone = normalizePhone(phone);
+  
+  if (cleanPhone.length < 10) {
+    return res.status(400).json({ error: 'Valid 10-digit phone number is required.' });
+  }
+
+  // Generate a random 4-digit OTP
+  const otp = Math.floor(1000 + Math.random() * 9000).toString();
+  const expires = Date.now() + 5 * 60 * 1000; // 5 minutes expiry
+
+  otpStore[cleanPhone] = { otp, expires };
+  console.log(`[OTP] Generated OTP ${otp} for phone ${cleanPhone}. Expires in 5 mins.`);
+
+  const fast2smsKey = process.env.FAST2SMS_API_KEY;
+  if (fast2smsKey) {
+    // Call Fast2SMS API (Indian SMS gateway)
+    const options = {
+      method: 'POST',
+      hostname: 'www.fast2sms.com',
+      path: '/dev/bulkV2',
+      headers: {
+        'authorization': fast2smsKey,
+        'Content-Type': 'application/json'
+      }
+    };
+    const smsReq = https.request(options, (smsRes) => {
+      let body = '';
+      smsRes.on('data', chunk => body += chunk);
+      smsRes.on('end', () => console.log('Fast2SMS Response:', body));
+    });
+    smsReq.on('error', err => console.error('Fast2SMS Error:', err));
+    smsReq.write(JSON.stringify({
+      route: 'otp',
+      variables_values: otp,
+      numbers: cleanPhone
+    }));
+    smsReq.end();
+  }
+
+  res.json({
+    success: true,
+    testMode: !fast2smsKey,
+    otp: !fast2smsKey ? otp : undefined, // return OTP code for testing if no API key is configured
+    message: fast2smsKey ? 'OTP sent via SMS' : 'OTP generated (demo mode)'
+  });
+});
+
+// Endpoint: Verify OTP
+app.post('/api/auth/verify-otp', (req, res) => {
+  const { phone, otp } = req.body;
+  const cleanPhone = normalizePhone(phone);
+  
+  if (!cleanPhone || !otp) {
+    return res.status(400).json({ error: 'Phone and OTP are required' });
+  }
+
+  const record = otpStore[cleanPhone];
+  if (!record) {
+    return res.status(400).json({ error: 'No OTP requested for this phone number' });
+  }
+
+  if (Date.now() > record.expires) {
+    delete otpStore[cleanPhone];
+    return res.status(400).json({ error: 'OTP has expired. Please request a new one.' });
+  }
+
+  if (record.otp !== otp.toString().trim()) {
+    return res.status(400).json({ error: 'Invalid OTP. Please check the code and try again.' });
+  }
+
+  // Success: delete OTP from store
+  delete otpStore[cleanPhone];
+
+  // Try to find the user's name to personalize the welcome message
+  let customerName = "Valued Guest";
+  const localOrders = getWhatsAppOrders();
+  const matchedLocal = localOrders.find(o => normalizePhone(o.customer_phone) === cleanPhone);
+  
+  if (matchedLocal) {
+    customerName = matchedLocal.customer_name;
+  } else {
+    const matchedMock = MOCK_SHOPIFY_ORDERS.find(o => o.customer && normalizePhone(o.customer.phone) === cleanPhone);
+    if (matchedMock) {
+      customerName = `${matchedMock.customer.first_name} ${matchedMock.customer.last_name}`;
+    }
+  }
+
+  res.json({
+    success: true,
+    phone: cleanPhone,
+    customerName
+  });
+});
+
 // Endpoint: Fetch Shopify Products
 app.get('/api/products', async (req, res) => {
   try {

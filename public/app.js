@@ -45,6 +45,16 @@ const el = {
   btnLogin: document.getElementById('btn-login'),
   btnAdminToggle: document.getElementById('btn-admin-login-toggle'),
   
+  // OTP Elements
+  phoneSection: document.getElementById('phone-section'),
+  otpSection: document.getElementById('otp-section'),
+  loginOtp: document.getElementById('login-otp'),
+  btnVerifyOtp: document.getElementById('btn-verify-otp'),
+  btnBackToPhone: document.getElementById('btn-back-to-phone'),
+  btnResendOtp: document.getElementById('btn-resend-otp'),
+  otpTimer: document.getElementById('otp-timer'),
+  otpHintMessage: document.getElementById('otp-hint-message'),
+  
   // Navigation & Profile
   menuItems: document.querySelectorAll('.menu-item'),
   tabPanels: document.querySelectorAll('.tab-panel'),
@@ -141,8 +151,11 @@ function registerServiceWorker() {
 
 // --- EVENT LISTENERS ---
 function setupEventListeners() {
-  // Login Buttons
-  el.btnLogin.addEventListener('click', handleLogin);
+  // Login & OTP Buttons
+  el.btnLogin.addEventListener('click', handleSendOTP);
+  el.btnVerifyOtp.addEventListener('click', handleVerifyOTP);
+  el.btnBackToPhone.addEventListener('click', handleBackToPhone);
+  el.btnResendOtp.addEventListener('click', handleResendOTP);
   el.btnAdminToggle.addEventListener('click', handleAdminBypass);
   el.btnLogout.addEventListener('click', handleLogout);
 
@@ -294,32 +307,151 @@ function switchTab(tabId) {
 }
 
 // --- LOGIN OPERATIONS ---
-function handleLogin() {
+let otpTimerInterval = null;
+
+async function handleSendOTP() {
   const phone = el.loginPhone.value.trim();
   if (phone.length < 10) {
-    alert("Please enter a valid 10 digit phone number.");
+    alert("Please enter a valid 10-digit phone number.");
     return;
   }
-  
-  state.userPhone = phone;
-  // Initialize with saved name or Valued Guest immediately
-  state.userName = localStorage.getItem(`mm_name_${phone}`) || "Valued Guest";
-  state.loyaltyTier = "Silver Club";
 
-  // Hide login, show App
-  el.loginContainer.classList.remove('active');
-  el.appContainer.classList.add('active');
-  el.adminMenuItem.classList.add('hidden'); // Hide admin tab for normal users
-  
-  const adminBtmNav = document.getElementById('admin-bottom-nav-item');
-  if (adminBtmNav) adminBtmNav.classList.add('hidden'); // Hide in mobile too
+  el.btnLogin.setAttribute('disabled', 'true');
+  el.btnLogin.textContent = 'Sending...';
 
-  // Load dashboards
-  loadCustomerDashboard();
-  switchTab('dashboard');
+  try {
+    const res = await fetch('/api/auth/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone })
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      alert(data.error || 'Failed to send OTP. Please try again.');
+      el.btnLogin.removeAttribute('disabled');
+      el.btnLogin.innerHTML = '<span>Send OTP</span> <i class="fa-solid fa-paper-plane"></i>';
+      return;
+    }
+
+    // Switch screen to OTP section
+    el.phoneSection.style.display = 'none';
+    el.otpSection.style.display = 'block';
+    el.loginOtp.value = '';
+    el.loginOtp.focus();
+
+    // If in demo mode (no SMS gateway configured), display the OTP for testing convenience
+    if (data.testMode) {
+      el.otpHintMessage.innerHTML = `<strong>Demo Mode:</strong> Use code <span style="color: #c5a880; font-size: 1.1em; font-weight: bold; border-bottom: 2px dashed #c5a880;">${data.otp}</span> to log in.`;
+    } else {
+      el.otpHintMessage.textContent = 'Enter the verification code sent to your phone.';
+    }
+
+    // Start timer countdown
+    startOtpCountdown();
+
+  } catch (err) {
+    console.error('Error sending OTP', err);
+    alert('Network error. Please try again.');
+  } finally {
+    el.btnLogin.removeAttribute('disabled');
+    el.btnLogin.innerHTML = '<span>Send OTP</span> <i class="fa-solid fa-paper-plane"></i>';
+  }
+}
+
+async function handleVerifyOTP() {
+  const phone = el.loginPhone.value.trim();
+  const otp = el.loginOtp.value.trim();
+
+  if (otp.length < 4) {
+    alert("Please enter the 4-digit verification code.");
+    return;
+  }
+
+  el.btnVerifyOtp.setAttribute('disabled', 'true');
+  el.btnVerifyOtp.textContent = 'Verifying...';
+
+  try {
+    const res = await fetch('/api/auth/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, otp })
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      alert(data.error || 'Invalid verification code. Please check and try again.');
+      return;
+    }
+
+    // OTP Verified! Log user in
+    state.userPhone = phone;
+    state.userName = data.customerName || localStorage.getItem(`mm_name_${phone}`) || "Valued Guest";
+    state.loyaltyTier = "Silver Club";
+
+    // Hide login container, show App
+    el.loginContainer.classList.remove('active');
+    el.appContainer.classList.add('active');
+    el.adminMenuItem.classList.add('hidden'); // Hide admin tab for normal users
+
+    const adminBtmNav = document.getElementById('admin-bottom-nav-item');
+    if (adminBtmNav) adminBtmNav.classList.add('hidden'); // Hide in mobile too
+
+    // Clean up login inputs & screen state for next logout
+    handleBackToPhone();
+
+    // Load customer dashboard
+    loadCustomerDashboard();
+    switchTab('dashboard');
+
+  } catch (err) {
+    console.error('Error verifying OTP', err);
+    alert('Network error. Please try again.');
+  } finally {
+    el.btnVerifyOtp.removeAttribute('disabled');
+    el.btnVerifyOtp.innerHTML = '<span>Verify & Login</span> <i class="fa-solid fa-circle-check"></i>';
+  }
+}
+
+function handleBackToPhone() {
+  // Clear intervals
+  if (otpTimerInterval) clearInterval(otpTimerInterval);
+  
+  el.otpSection.style.display = 'none';
+  el.phoneSection.style.display = 'block';
+  el.loginOtp.value = '';
+}
+
+function handleResendOTP(e) {
+  if (e) e.preventDefault();
+  handleSendOTP();
+}
+
+function startOtpCountdown() {
+  if (otpTimerInterval) clearInterval(otpTimerInterval);
+  
+  let timeLeft = 60;
+  el.otpTimer.style.display = 'inline';
+  el.btnResendOtp.style.display = 'none';
+  el.otpTimer.textContent = `Resend OTP in ${timeLeft}s`;
+
+  otpTimerInterval = setInterval(() => {
+    timeLeft--;
+    if (timeLeft <= 0) {
+      clearInterval(otpTimerInterval);
+      el.otpTimer.style.display = 'none';
+      el.btnResendOtp.style.display = 'inline';
+    } else {
+      el.otpTimer.textContent = `Resend OTP in ${timeLeft}s`;
+    }
+  }, 1000);
 }
 
 function handleAdminBypass() {
+  // Clear any active OTP timers
+  if (otpTimerInterval) clearInterval(otpTimerInterval);
+  handleBackToPhone();
+
   state.userPhone = "9999999999";
   state.userName = "Brand Admin";
   state.loyaltyTier = "Luxe Designer";
@@ -341,6 +473,7 @@ function handleLogout() {
   el.appContainer.classList.remove('active');
   el.loginContainer.classList.add('active');
   el.loginPhone.value = '';
+  handleBackToPhone();
 }
 
 // --- PRODUCT SYNC & CATALOG RENDER ---

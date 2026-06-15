@@ -34,18 +34,44 @@
       
       <div class="login-body">
         <p class="login-desc">Apne orders track karne aur website/WhatsApp purchase history dekhne ke liye enter karein:</p>
-        <div class="input-group">
-          <label for="login-phone">WhatsApp/Phone Number</label>
-          <div class="input-with-icon">
-            <i class="fa-solid fa-phone"></i>
-            <input type="tel" id="login-phone" placeholder="9876543210" maxlength="10">
-          </div>
-          <span class="input-hint">Enter 10-digit number without country code (+91)</span>
-        </div>
         
-        <button id="btn-login" class="btn btn-gold btn-block">
-          <span>Login securely</span> <i class="fa-solid fa-arrow-right"></i>
-        </button>
+        <!-- STEP 1: ENTER PHONE NUMBER -->
+        <div id="phone-section">
+          <div class="input-group">
+            <label for="login-phone">WhatsApp/Phone Number</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-phone"></i>
+              <input type="tel" id="login-phone" placeholder="9876543210" maxlength="10">
+            </div>
+            <span class="input-hint">Enter 10-digit number without country code (+91)</span>
+          </div>
+          
+          <button id="btn-login" class="btn btn-gold btn-block">
+            <span>Send OTP</span> <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+
+        <!-- STEP 2: ENTER OTP -->
+        <div id="otp-section" style="display: none;">
+          <div class="input-group">
+            <label for="login-otp">Enter 4-Digit OTP</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-key"></i>
+              <input type="text" id="login-otp" placeholder="••••" maxlength="4" style="letter-spacing: 0.5em; text-align: center; font-weight: bold;">
+            </div>
+            <span class="input-hint" id="otp-hint-message">Enter the verification code sent to your number.</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; font-size: 0.85rem;">
+            <a href="#" id="btn-back-to-phone" style="color: #c5a880; text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Change Number</a>
+            <span id="otp-timer" style="color: #9ca3af;">Resend OTP in 59s</span>
+            <a href="#" id="btn-resend-otp" style="color: #c5a880; text-decoration: none; display: none;">Resend OTP</a>
+          </div>
+          
+          <button id="btn-verify-otp" class="btn btn-gold btn-block">
+            <span>Verify & Login</span> <i class="fa-solid fa-circle-check"></i>
+          </button>
+        </div>
 
         <div class="divider">
           <span>OR</span>
