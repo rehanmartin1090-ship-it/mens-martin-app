@@ -1,0 +1,114 @@
+[
+  {
+    "id": "WA-1002",
+    "customer_name": "Rajesh Kumar",
+    "customer_phone": "9876543210",
+    "customer_email": "",
+    "customer_address": "Awaiting shipping address verification",
+    "date": "2026-06-14T22:53:24.045Z",
+    "status": "pending",
+    "total_price": 8697,
+    "source": "whatsapp",
+    "items": [
+      {
+        "title": "Abstract Lion Fully Embellished hand embroidered designer shirt - Black",
+        "quantity": 1,
+        "variant": "3 meters",
+        "price": 8697
+      }
+    ],
+    "payment_status": "pending_approval",
+    "payment_receipt": "pending_receipt_upload.jpg",
+    "carrier": "",
+    "tracking_number": "",
+    "tracking_url": "",
+    "notes": "App in-app cart check-out"
+  },
+  {
+    "id": "WA-1001",
+    "customer_name": "Rajesh Kumar",
+    "customer_phone": "9876543210",
+    "customer_email": "rajesh@gmail.com",
+    "customer_address": "Flat 402, Golden Heights, Sector 62, Noida, UP - 201301",
+    "date": "2026-05-10T14:32:00.000Z",
+    "status": "delivered",
+    "total_price": 5800,
+    "source": "whatsapp",
+    "items": [
+      {
+        "title": "Super 120 Royal Navy Blue Suiting Fabric",
+        "quantity": 1,
+        "variant": "3.5 meters",
+        "price": 2030
+      },
+      {
+        "title": "Premium Linen Charcoal Black Fabric",
+        "quantity": 2,
+        "variant": "3 meters",
+        "price": 3770
+      }
+    ],
+    "payment_status": "approved",
+    "payment_receipt": "receipt_wa_1001.jpg",
+    "carrier": "Delhivery",
+    "tracking_number": "DEL129384811",
+    "tracking_url": "https://www.delhivery.com/track/package/DEL129384811",
+    "notes": "Delivered on time. Customer preferred double-breasted suit length."
+  },
+  {
+    "id": "WA-1002",
+    "customer_name": "Rajesh Kumar",
+    "customer_phone": "9876543210",
+    "customer_email": "rajesh@gmail.com",
+    "customer_address": "Flat 402, Golden Heights, Sector 62, Noida, UP - 201301",
+    "date": "2026-06-13T09:15:00.000Z",
+    "status": "in_transit",
+    "total_price": 2890,
+    "source": "whatsapp",
+    "items": [
+      {
+        "title": "Super 120 Dark Green Dobby Suiting Fabric",
+        "quantity": 1,
+        "variant": "2 meters",
+        "price": 1160
+      },
+      {
+        "title": "Counts Luxury White Cotton Fabric",
+        "quantity": 1,
+        "variant": "3 meters",
+        "price": 1730
+      }
+    ],
+    "payment_status": "approved",
+    "payment_receipt": "receipt_wa_1002.jpg",
+    "carrier": "Shiprocket (Delhivery)",
+    "tracking_number": "SR998127394",
+    "tracking_url": "https://www.shiprocket.in/shipment-tracking/SR998127394",
+    "notes": "Bulk uploaded to Shiprocket. Package dispatched from Delhi Hub."
+  },
+  {
+    "id": "WA-1003",
+    "customer_name": "Rajesh Kumar",
+    "customer_phone": "9876543210",
+    "customer_email": "rajesh@gmail.com",
+    "customer_address": "Flat 402, Golden Heights, Sector 62, Noida, UP - 201301",
+    "date": "2026-06-15T01:22:00.000Z",
+    "status": "pending",
+    "total_price": 1160,
+    "source": "whatsapp",
+    "items": [
+      {
+        "title": "Super 120 Dark Green Dobby Suiting Fabric",
+        "quantity": 1,
+        "variant": "2 meters",
+        "price": 1160
+      }
+    ],
+    "payment_status": "pending_approval",
+    "payment_receipt": "receipt_wa_1003_temp.jpg",
+    "carrier": "",
+    "tracking_number": "",
+    "tracking_url": "",
+    "notes": "Payment receipt uploaded by customer. Awaiting admin approval."
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "name": "Mens Martin Fabrics",
+  "short_name": "Mens Martin",
+  "description": "Unified Order Tracker & Premium Fabric Store",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#d4af37",
+  "icons": [
+    {
+      "src": "https://placehold.co/192x192/030712/d4af37?text=MM",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://placehold.co/512x512/030712/d4af37?text=Mens+Martin",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

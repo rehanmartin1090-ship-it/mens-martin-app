@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mens Martin | Unified Brand App</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#d4af37">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="https://placehold.co/192x192/030712/d4af37?text=MM">
+  <!-- Google Fonts: Playfair Display for Serif luxury headers, Outfit for modern clean UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Background Glowing Orbs -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <!-- LOGIN CONTAINER -->
+  <div id="login-container" class="page-container active">
+    <div class="login-card glass">
+      <div class="login-header">
+        <h1 class="brand-title">MENS MARTIN</h1>
+        <p class="brand-subtitle">PREMIUM FABRICS & TAILORING</p>
+      </div>
+      
+      <div class="login-body">
+        <p class="login-desc">Apne orders track karne aur website/WhatsApp purchase history dekhne ke liye enter karein:</p>
+        <div class="input-group">
+          <label for="login-phone">WhatsApp/Phone Number</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-phone"></i>
+            <input type="tel" id="login-phone" placeholder="9876543210" maxlength="10">
+          </div>
+          <span class="input-hint">Enter 10-digit number without country code (+91)</span>
+        </div>
+        
+        <button id="btn-login" class="btn btn-gold btn-block">
+          <span>Login securely</span> <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <div class="divider">
+          <span>OR</span>
+        </div>
+
+        <button id="btn-admin-login-toggle" class="btn btn-outline-gold btn-block">
+          <i class="fa-solid fa-user-gear"></i> Admin Dashboard Switch
+        </button>
+      </div>
+      
+      <div class="login-footer">
+        <p>© 2026 Mens Martin. All orders are secured & prepaid.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div id="app-container" class="page-container">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar glass">
+      <div class="sidebar-header">
+        <h2 class="sidebar-brand">MENS MARTIN</h2>
+        <span class="user-tier-badge" id="sidebar-tier">Silver Club</span>
+      </div>
+
+      <nav class="sidebar-menu">
+        <a href="#" class="menu-item active" data-tab="dashboard">
+          <i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span>
+        </a>
+        <a href="#" class="menu-item" data-tab="catalog">
+          <i class="fa-solid fa-shirt"></i> <span>Fabric Gallery</span>
+        </a>
+        <a href="#" class="menu-item" id="admin-menu-item" data-tab="admin">
+          <i class="fa-solid fa-screwdriver-wrench"></i> <span>Admin Panel</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="logged-user-info">
+          <div class="user-avatar"><i class="fa-solid fa-user-tie"></i></div>
+          <div class="user-details">
+            <h4 id="user-name-display">Valued Guest</h4>
+            <p id="user-phone-display">+91 0000000000</p>
+          </div>
+        </div>
+        <button id="btn-logout" class="btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="content-area">
+      
+      <!-- TAB: DASHBOARD -->
+      <section id="tab-dashboard" class="tab-panel active">
+        <div class="panel-header">
+          <div>
+            <h1 class="panel-title">Welcome back, <span id="welcome-name">Guest</span></h1>
+            <p class="panel-subtitle">Here is a summary of your orders and fabric purchases.</p>
+          </div>
+          <div class="tier-display glass-gold">
+            <i class="fa-solid fa-medal"></i>
+            <div>
+              <span class="tier-label">LOYALTY MEMBERSHIP</span>
+              <span class="tier-value" id="loyalty-tier-name">Gold Club Member</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metrics Cards Grid -->
+        <div class="metrics-grid">
+          <div class="metric-card glass card-month">
+            <div class="metric-icon"><i class="fa-solid fa-calendar-days"></i></div>
+            <div class="metric-info">
+              <h3>Spent this Month</h3>
+              <p class="metric-val" id="metric-spent-month">₹0.00</p>
+            </div>
+          </div>
+          <div class="metric-card glass card-year">
+            <div class="metric-icon"><i class="fa-solid fa-coins"></i></div>
+            <div class="metric-info">
+              <h3>Spent this Year</h3>
+              <p class="metric-val" id="metric-spent-year">₹0.00</p>
+            </div>
+          </div>
+          <div class="metric-card glass card-orders">
+            <div class="metric-icon"><i class="fa-solid fa-dolly"></i></div>
+            <div class="metric-info">
+              <h3>Status Overview</h3>
+              <div class="mini-status-grid">
+                <div><span class="status-num" id="status-pending-count">0</span><span class="status-lbl">Pending</span></div>
+                <div><span class="status-num" id="status-transit-count">0</span><span class="status-lbl">In Transit</span></div>
+                <div><span class="status-num" id="status-delivered-count">0</span><span class="status-lbl">Delivered</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle Dashboard Grid: Chart + Orders -->
+        <div class="dashboard-details-grid">
+          
+          <!-- Spending History Chart -->
+          <div class="details-card glass chart-card">
+            <div class="details-card-header">
+              <h2><i class="fa-solid fa-chart-line"></i> Spending Tracker (2026)</h2>
+              <span class="card-badge">Yearly Analytics</span>
+            </div>
+            <div class="chart-container">
+              <svg id="spending-svg-chart" viewBox="0 0 600 220">
+                <!-- Dynamic SVG bars will be drawn here -->
+              </svg>
+            </div>
+          </div>
+
+          <!-- Active Order Progress Tracker -->
+          <div class="details-card glass tracker-card" id="active-tracker-container">
+            <div class="details-card-header">
+              <h2><i class="fa-solid fa-truck-fast"></i> Latest Delivery Status</h2>
+              <span class="card-badge-status" id="latest-order-source-badge">WhatsApp</span>
+            </div>
+            
+            <div class="active-tracker-body" id="tracker-body-content">
+              <div class="tracker-order-id">Order ID: <span id="track-order-id">#WA-1002</span></div>
+              
+              <!-- Progress timeline bar -->
+              <div class="timeline-stepper">
+                <div class="step step-completed" id="step-placed">
+                  <div class="step-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                  <div class="step-label">Placed</div>
+                </div>
+                <div class="step step-completed" id="step-paid-verify">
+                  <div class="step-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+                  <div class="step-label">Verified</div>
+                </div>
+                <div class="step" id="step-transit">
+                  <div class="step-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
+                  <div class="step-label">Shipped</div>
+                </div>
+                <div class="step" id="step-delivered">
+                  <div class="step-icon"><i class="fa-solid fa-house-chimney-check"></i></div>
+                  <div class="step-label">Delivered</div>
+                </div>
+              </div>
+
+              <div class="tracking-logistics-info glass-gold">
+                <div class="logistics-partner">
+                  <img src="https://placehold.co/80x30/000000/ffffff?text=Delhivery" id="carrier-logo" alt="Logistics Partner">
+                  <div>
+                    <h4 id="carrier-name-display">Delhivery Cargo</h4>
+                    <p>Tracking ID: <strong id="tracking-number-display">DEL129384811</strong></p>
+                  </div>
+                </div>
+                <a href="#" target="_blank" id="btn-track-action" class="btn btn-gold btn-sm"><i class="fa-solid fa-arrow-up-right-from-square"></i> Track live</a>
+              </div>
+            </div>
+            
+            <div id="no-active-orders-msg" class="empty-state-msg hidden">
+              <i class="fa-solid fa-circle-check"></i>
+              <p>No pending or in-transit orders active.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Orders Table List -->
+        <div class="details-card glass full-width-card">
+          <div class="details-card-header">
+            <h2><i class="fa-solid fa-clock-rotate-left"></i> Comprehensive Order History</h2>
+            <div class="filter-controls">
+              <button class="filter-btn active" data-filter="all">All Orders</button>
+              <button class="filter-btn" data-filter="website"><i class="fa-solid fa-globe"></i> Website</button>
+              <button class="filter-btn" data-filter="whatsapp"><i class="fa-solid fa-brands fa-whatsapp"></i> WhatsApp</button>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="orders-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Date</th>
+                  <th>Source</th>
+                  <th>Items Ordered</th>
+                  <th>Total Amount</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table-body">
+                <!-- Dynamically generated rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: FABRIC CATALOG -->
+      <section id="tab-catalog" class="tab-panel">
+        <div class="panel-header">
+          <div>
+            <h1 class="panel-title">Premium Fabric Gallery</h1>
+            <p class="panel-subtitle">Explore premium counts, luxury suitings, and linen fabrics directly synced from our website.</p>
+          </div>
+        </div>
+
+        <!-- YouTube Showcase Banner -->
+        <div class="youtube-showcase glass">
+          <div class="showcase-content">
+            <span class="accent-tag"><i class="fa-solid fa-fire"></i> AS SEEN ON YOUTUBE</span>
+            <h2>Latest Fabric Video Showcase</h2>
+            <p>Aap humari latest fabric launch video yahi dekh kar seedha un kapdo ko order kar sakte hain jo video me show kiye gaye hain.</p>
+            <div class="video-grid-selector">
+              <button class="video-tab active" data-video="video1">
+                <i class="fa-solid fa-circle-play"></i> Super 120 Premium Suiting Launch
+              </button>
+              <button class="video-tab" data-video="video2">
+                <i class="fa-solid fa-circle-play"></i> Summer Special Linen Collection
+              </button>
+            </div>
+          </div>
+          
+          <div class="showcase-media">
+            <!-- Simulated YouTube Embed Interface -->
+            <div class="simulated-youtube glass">
+              <img src="https://placehold.co/640x360/0f172a/ffffff?text=Mens+Martin+Youtube+Showcase" id="youtube-thumbnail" alt="Youtube Video">
+              <div class="yt-play-overlay"><i class="fa-brands fa-youtube"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video Fabrics Carousel Tag -->
+        <div class="video-tagged-header">
+          <h3><i class="fa-solid fa-tags"></i> Fabrics Shown in this Video</h3>
+          <p>Neeche se fabric choose karein, apni length (meters) select karein aur check-out karein.</p>
+        </div>
+
+        <!-- Catalog Filter and Fabrics Grid -->
+        <div class="catalog-workspace">
+          
+          <!-- Fabrics Grid -->
+          <div class="fabrics-container">
+            <div class="catalog-filters glass">
+              <span class="filter-label">Filter Collections:</span>
+              <button class="cat-filter-btn active" data-cat="all">All Fabrics</button>
+              <button class="cat-filter-btn" data-cat="suiting">Suiting Fabrics</button>
+              <button class="cat-filter-btn" data-cat="linen">Linen Collections</button>
+              <button class="cat-filter-btn" data-cat="cotton">White Cotton</button>
+            </div>
+
+            <div class="fabrics-grid" id="fabrics-grid-list">
+              <!-- Fabric Cards -->
+            </div>
+          </div>
+
+          <!-- Fabric Visualizer Panel -->
+          <div class="visualizer-sidebar glass">
+            <div class="visualizer-header">
+              <h3><i class="fa-solid fa-wand-magic-sparkles"></i> 3D Custom Suit Visualizer</h3>
+              <p>Choose a fabric from the catalog and preview how it will look as a tailored outfit.</p>
+            </div>
+
+            <div class="visualizer-preview-container">
+              <!-- Visualizer SVG Model Outline -->
+              <div class="visualizer-model-wrapper">
+                <svg id="visualizer-svg-outline" class="suit-mode" viewBox="0 0 200 450">
+                  <!-- Body/Face minimal sketch -->
+                  <path d="M90,40 C90,30 110,30 110,40 C110,48 90,48 90,40 Z" fill="none" stroke="#c5a880" stroke-width="1.5" />
+                  <path d="M96,48 L104,48 L104,58 L96,58 Z" fill="none" stroke="#c5a880" stroke-width="1.5" />
+                  
+                  <!-- Suit Jacket (detailed sketch with creases, buttons, pocket square) -->
+                  <!-- Main Jacket Body -->
+                  <path id="model-jacket" class="visual-fillable" d="M65,95 C75,95 125,95 135,95 C145,150 148,220 132,270 C120,272 80,272 68,270 C52,220 55,150 65,95 Z" fill="#334155" stroke="#c5a880" stroke-width="1.5" />
+                  
+                  <!-- Left Sleeve (with elegant forearm crease) -->
+                  <path id="model-sleeve-left" class="visual-fillable" d="M65,95 C55,120 42,160 38,215 C45,218 52,216 56,212 C57,175 66,130 72,112 Z" fill="#334155" stroke="#c5a880" stroke-width="1.5" />
+                  
+                  <!-- Right Sleeve -->
+                  <path id="model-sleeve-right" class="visual-fillable" d="M135,95 C145,120 158,160 162,215 C155,218 148,216 144,212 C143,175 134,130 128,112 Z" fill="#334155" stroke="#c5a880" stroke-width="1.5" />
+                  
+                  <!-- Lapel / V-neck area (minimal luxury style) -->
+                  <path d="M85,95 L100,165 L115,95 Z" fill="#ffffff" stroke="#c5a880" stroke-width="1" /> <!-- Shirt -->
+                  <path d="M98,165 L98,105 L102,105 L102,165 Z" fill="#c5a880" /> <!-- Elegant Tie -->
+                  
+                  <!-- Left Lapel -->
+                  <path d="M65,95 L90,145 L100,165 L88,165 L68,112 Z" fill="#18181b" stroke="#c5a880" stroke-width="1.2" />
+                  <!-- Right Lapel -->
+                  <path d="M135,95 L110,145 L100,165 L112,165 L132,112 Z" fill="#18181b" stroke="#c5a880" stroke-width="1.2" />
+                  
+                  <!-- Pocket Square -->
+                  <path d="M72,122 L82,120 L80,126 L74,127 Z" fill="#c5a880" /> 
+                  <path d="M70,126 L84,124" stroke="#c5a880" stroke-width="1" /> <!-- Pocket rim -->
+
+                  <!-- Buttons -->
+                  <circle cx="100" cy="185" r="3" fill="#c5a880" />
+                  <circle cx="100" cy="205" r="3" fill="#c5a880" />
+
+                  <!-- Pants Trousers (detailed creases and tapered fit) -->
+                  <path id="model-pants" class="visual-fillable" d="M68,270 L132,270 L134,395 C122,397 110,398 103,396 L102,325 L98,325 L97,396 C90,398 78,397 66,395 Z" fill="#475569" stroke="#c5a880" stroke-width="1.5" />
+                  <!-- Pants crease lines -->
+                  <path d="M84,285 L81,390" stroke="rgba(197, 168, 128, 0.3)" stroke-width="1" />
+                  <path d="M116,285 L119,390" stroke="rgba(197, 168, 128, 0.3)" stroke-width="1" />
+
+                  <!-- Hands and Shoes -->
+                  <path d="M38,215 C36,222 42,225 44,222 Z" fill="#f3e5ab" />
+                  <path d="M162,215 C164,222 158,225 156,222 Z" fill="#f3e5ab" />
+                  <!-- Sleek Tapered Leather Shoes -->
+                  <path d="M66,395 L55,408 L72,412 C74,402 72,396 66,395 Z" fill="#000000" stroke="#c5a880" stroke-width="1" />
+                  <path d="M134,395 L145,408 L128,412 C126,402 128,396 134,395 Z" fill="#000000" stroke="#c5a880" stroke-width="1" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="visualizer-controls">
+              <span class="visualizer-fabric-name">Selected: <strong id="vis-fabric-title">Super 120 Royal Navy Blue</strong></span>
+              <div class="visualizer-options-row">
+                <button class="btn btn-outline-gold btn-sm active" id="btn-mode-suit">Suit</button>
+                <button class="btn btn-outline-gold btn-sm" id="btn-mode-shirt">Shirt Only</button>
+                <button class="btn btn-outline-gold btn-sm" id="btn-mode-pants">Pants Only</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB: ADMIN PANEL -->
+      <section id="tab-admin" class="tab-panel">
+        <div class="panel-header">
+          <div>
+            <h1 class="panel-title">Admin Management Console</h1>
+            <p class="panel-subtitle">Manage customer WhatsApp orders, approve prepaid receipts, and bulk upload Shiprocket delivery files.</p>
+          </div>
+        </div>
+
+        <div class="admin-grid">
+          
+          <!-- Column 1: Log WhatsApp Order -->
+          <div class="details-card glass">
+            <div class="details-card-header">
+              <h2><i class="fa-solid fa-circle-plus"></i> Log New WhatsApp Order</h2>
+            </div>
+            <form id="admin-order-form" class="admin-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="admin-cust-phone">Customer Phone (WhatsApp)</label>
+                  <input type="tel" id="admin-cust-phone" placeholder="9876543210" required>
+                </div>
+                <div class="form-group">
+                  <label for="admin-cust-name">Customer Full Name</label>
+                  <input type="text" id="admin-cust-name" placeholder="Raj Kumar" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="admin-cust-email">Customer Email (Optional)</label>
+                  <input type="email" id="admin-cust-email" placeholder="customer@gmail.com">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="admin-cust-address">Shipping Address</label>
+                <textarea id="admin-cust-address" rows="2" placeholder="House no, Building, Area, City, Pincode" required></textarea>
+              </div>
+
+              <!-- Selected Fabric Item Selector -->
+              <div class="fabric-selector-box glass-gold">
+                <h4>Select Ordered Fabric</h4>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="admin-select-fabric">Fabric Description</label>
+                    <select id="admin-select-fabric">
+                      <!-- Loaded via JS -->
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="admin-select-length">Length Required</label>
+                    <select id="admin-select-length">
+                      <option value="1.2 meters">1.2 meters (Pants)</option>
+                      <option value="2 meters">2 meters (Waistcoat)</option>
+                      <option value="3 meters">3 meters (2-Piece Suit)</option>
+                      <option value="3.5 meters">3.5 meters (Double-Breasted Suit)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="admin-custom-price">Total Price (₹)</label>
+                    <input type="number" id="admin-custom-price" value="1160">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="admin-order-notes">Internal Notes (Optional)</label>
+                <input type="text" id="admin-order-notes" placeholder="e.g. YouTube video screenshot verified">
+              </div>
+
+              <button type="submit" class="btn btn-gold btn-block"><i class="fa-solid fa-check"></i> Log Prepaid Order</button>
+            </form>
+          </div>
+
+          <!-- Column 2: Logistics / Shiprocket Operations -->
+          <div class="details-card glass">
+            <div class="details-card-header">
+              <h2><i class="fa-solid fa-truck-ramp-box"></i> Bulk Shiprocket Integrations</h2>
+            </div>
+            
+            <div class="logistics-operations">
+              <!-- Export Section -->
+              <div class="ops-box">
+                <h3>1. Export Booking Template</h3>
+                <p>Generate bulk booking CSV file matching Shiprocket's uploading template containing all pending WhatsApp orders.</p>
+                <button id="btn-export-shiprocket" class="btn btn-gold btn-block">
+                  <i class="fa-solid fa-file-csv"></i> Download Booking CSV
+                </button>
+              </div>
+
+              <!-- Import Section -->
+              <div class="ops-box mt-20">
+                <h3>2. Import Manifest / Tracking CSV</h3>
+                <p>Upload the shipping manifest CSV report from Shiprocket/Delhivery to bulk-apply tracking numbers, carriers, and change status to 'In Transit'.</p>
+                
+                <div class="csv-upload-zone" id="csv-dropzone">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <p>Drag & Drop or Click to Upload Shipping CSV</p>
+                  <input type="file" id="manifest-csv-file" accept=".csv" class="hidden">
+                  <span id="csv-file-name" class="selected-file-label"></span>
+                </div>
+
+                <button id="btn-import-manifest" class="btn btn-outline-gold btn-block mt-10" disabled>
+                  <i class="fa-solid fa-file-import"></i> Apply Bulk Tracking Details
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Admin: Pending Action Orders Table -->
+        <div class="details-card glass full-width-card mt-20">
+          <div class="details-card-header">
+            <h2><i class="fa-solid fa-list-check"></i> Active WhatsApp Orders Queue</h2>
+          </div>
+
+          <div class="table-container">
+            <table class="orders-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer Phone</th>
+                  <th>Name</th>
+                  <th>Fabric Details</th>
+                  <th>Amount</th>
+                  <th>Receipt Status</th>
+                  <th>Fulfillment Status</th>
+                  <th>Fulfillment Controls</th>
+                </tr>
+              </thead>
+              <tbody id="admin-orders-queue-body">
+                <!-- Loaded via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- CHECKOUT MODAL -->
+  <div id="checkout-modal" class="modal-backdrop hidden">
+    <div class="modal-card glass-gold animate-zoom">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-wallet"></i> Secure Prepaid UPI Checkout</h3>
+        <button class="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body text-center">
+        <p>Aapki order details aur length select ho chuki hai. Kripya ₹<span id="modal-checkout-amount">0.00</span> ki payment karein.</p>
+        
+        <!-- Generated QR Code Container -->
+        <div class="qr-container">
+          <!-- Dynamic QR mockup -->
+          <svg class="qr-svg-mockup" viewBox="0 0 100 100">
+            <rect x="0" y="0" width="100" height="100" fill="#ffffff" />
+            <!-- Corners -->
+            <rect x="5" y="5" width="25" height="25" fill="#000000" />
+            <rect x="10" y="10" width="15" height="15" fill="#ffffff" />
+            <rect x="70" y="5" width="25" height="25" fill="#000000" />
+            <rect x="75" y="10" width="15" height="15" fill="#ffffff" />
+            <rect x="5" y="70" width="25" height="25" fill="#000000" />
+            <rect x="10" y="75" width="15" height="15" fill="#ffffff" />
+            <!-- Inner random dots simulating QR -->
+            <rect x="40" y="40" width="20" height="20" fill="#000000" />
+            <rect x="45" y="45" width="10" height="10" fill="#ffffff" />
+            <rect x="15" y="40" width="10" height="15" fill="#000000" />
+            <rect x="40" y="15" width="15" height="10" fill="#000000" />
+            <rect x="70" y="40" width="15" height="15" fill="#000000" />
+            <rect x="40" y="70" width="15" height="15" fill="#000000" />
+          </svg>
+          <div class="qr-logo"><i class="fa-solid fa-lock"></i> UPI</div>
+        </div>
+
+        <p class="upi-address-text">UPI ID: <strong>mensmartin@upi</strong></p>
+        <p class="payment-instructions">Scan karke pay karein aur niche payment ka screenshot (receipt) upload karein.</p>
+
+        <!-- Image Upload for Screenshot -->
+        <div class="upload-receipt-area">
+          <label for="receipt-file-input" class="btn btn-outline-gold">
+            <i class="fa-solid fa-image"></i> Select Payment Screenshot
+          </label>
+          <input type="file" id="receipt-file-input" accept="image/*" class="hidden">
+          <span id="receipt-file-name" class="selected-file-label">Awaiting file...</span>
+        </div>
+
+        <button id="btn-submit-order-receipt" class="btn btn-gold btn-block mt-20" disabled>
+          <i class="fa-solid fa-paper-plane"></i> Submit Payment Receipt
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE BOTTOM NAVIGATION BAR -->
+  <nav class="bottom-nav glass">
+    <a href="#" class="bottom-nav-item active" data-tab="dashboard">
+      <i class="fa-solid fa-chart-pie"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-tab="catalog">
+      <i class="fa-solid fa-shirt"></i>
+      <span>Fabric Gallery</span>
+    </a>
+    <a href="#" class="bottom-nav-item id-admin-bottom-nav hidden" id="admin-bottom-nav-item" data-tab="admin">
+      <i class="fa-solid fa-screwdriver-wrench"></i>
+      <span>Admin</span>
+    </a>
+  </nav>
+
+  <!-- JS Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
