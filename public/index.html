@@ -71,6 +71,24 @@
           <button id="btn-verify-otp" class="btn btn-gold btn-block">
             <span>Verify & Login</span> <i class="fa-solid fa-circle-check"></i>
           </button>
+        <!-- STEP 3: ADMIN PIN LOGIN -->
+        <div id="admin-pin-section" style="display: none;">
+          <div class="input-group">
+            <label for="admin-access-pin">Enter Store Manager PIN</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-shield-halved"></i>
+              <input type="password" id="admin-access-pin" placeholder="••••" maxlength="6" style="letter-spacing: 0.5em; text-align: center; font-weight: bold;">
+            </div>
+            <span class="input-hint">Enter the 6-digit access PIN to authorize this device.</span>
+          </div>
+
+          <div style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 1.5rem; font-size: 0.85rem;">
+            <a href="#" id="btn-admin-back-to-phone" style="color: #c5a880; text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Back to Customer Login</a>
+          </div>
+          
+          <button id="btn-verify-admin-pin" class="btn btn-gold btn-block">
+            <span>Authorize & Login</span> <i class="fa-solid fa-key"></i>
+          </button>
         </div>
 
         <div class="divider">
@@ -78,7 +96,7 @@
         </div>
 
         <button id="btn-admin-login-toggle" class="btn btn-outline-gold btn-block">
-          <i class="fa-solid fa-user-gear"></i> Admin Dashboard Switch
+          <i class="fa-solid fa-lock"></i> Store Manager Login
         </button>
       </div>
       
@@ -411,64 +429,60 @@
           <!-- Column 1: Log WhatsApp Order -->
           <div class="details-card glass">
             <div class="details-card-header">
-              <h2><i class="fa-solid fa-circle-plus"></i> Log New WhatsApp Order</h2>
+              <h2><i class="fa-solid fa-file-invoice-dollar"></i> WhatsApp Order Entry Form</h2>
             </div>
             <form id="admin-order-form" class="admin-form">
               <div class="form-row">
                 <div class="form-group">
-                  <label for="admin-cust-phone">Customer Phone (WhatsApp)</label>
-                  <input type="tel" id="admin-cust-phone" placeholder="9876543210" required>
-                </div>
-                <div class="form-group">
-                  <label for="admin-cust-name">Customer Full Name</label>
+                  <label for="admin-cust-name">Customer Name</label>
                   <input type="text" id="admin-cust-name" placeholder="Raj Kumar" required>
                 </div>
+                <div class="form-group">
+                  <label for="admin-cust-phone">Customer Phone Number (WhatsApp)</label>
+                  <input type="tel" id="admin-cust-phone" placeholder="9876543210" required>
+                </div>
               </div>
+              
               <div class="form-row">
                 <div class="form-group">
-                  <label for="admin-cust-email">Customer Email (Optional)</label>
-                  <input type="email" id="admin-cust-email" placeholder="customer@gmail.com">
+                  <label for="admin-fabric-name">Fabric Name / Product Code</label>
+                  <input type="text" id="admin-fabric-name" placeholder="e.g. Navy Blue Suiting (MM-101)" required>
                 </div>
-              </div>
-              <div class="form-group">
-                <label for="admin-cust-address">Shipping Address</label>
-                <textarea id="admin-cust-address" rows="2" placeholder="House no, Building, Area, City, Pincode" required></textarea>
-              </div>
-
-              <!-- Selected Fabric Item Selector -->
-              <div class="fabric-selector-box glass-gold">
-                <h4>Select Ordered Fabric</h4>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="admin-select-fabric">Fabric Description</label>
-                    <select id="admin-select-fabric">
-                      <!-- Loaded via JS -->
-                    </select>
-                  </div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="admin-select-length">Length Required</label>
-                    <select id="admin-select-length">
-                      <option value="1.2 meters">1.2 meters (Pants)</option>
-                      <option value="2 meters">2 meters (Waistcoat)</option>
-                      <option value="3 meters">3 meters (2-Piece Suit)</option>
-                      <option value="3.5 meters">3.5 meters (Double-Breasted Suit)</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label for="admin-custom-price">Total Price (₹)</label>
-                    <input type="number" id="admin-custom-price" value="1160">
-                  </div>
+                <div class="form-group">
+                  <label for="admin-order-date">Order Date & Time</label>
+                  <input type="datetime-local" id="admin-order-date" required>
                 </div>
               </div>
 
-              <div class="form-group">
-                <label for="admin-order-notes">Internal Notes (Optional)</label>
-                <input type="text" id="admin-order-notes" placeholder="e.g. YouTube video screenshot verified">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="admin-order-amount">Total Order Amount (Prepaid in ₹)</label>
+                  <input type="number" id="admin-order-amount" placeholder="3500" required>
+                </div>
+                <div class="form-group">
+                  <label for="admin-order-status">Current Order Status</label>
+                  <select id="admin-order-status">
+                    <option value="pending" selected>Pending</option>
+                    <option value="in_transit">In Transit</option>
+                    <option value="delivered">Delivered</option>
+                  </select>
+                </div>
               </div>
 
-              <button type="submit" class="btn btn-gold btn-block"><i class="fa-solid fa-check"></i> Log Prepaid Order</button>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="admin-courier-partner">Courier Partner (Optional)</label>
+                  <input type="text" id="admin-courier-partner" placeholder="e.g. Delhivery, Shiprocket">
+                </div>
+                <div class="form-group">
+                  <label for="admin-tracking-id">Tracking ID (Optional)</label>
+                  <input type="text" id="admin-tracking-id" placeholder="e.g. 1283726382">
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-gold btn-block" style="margin-top: 1rem; font-size: 1.1rem; padding: 0.85rem 1rem;">
+                <i class="fa-solid fa-circle-check"></i> Submit Order
+              </button>
             </form>
           </div>
 

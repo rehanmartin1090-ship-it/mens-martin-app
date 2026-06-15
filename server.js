@@ -462,6 +462,18 @@ app.get('/api/orders', async (req, res) => {
   });
 });
 
+// Endpoint: Admin PIN login verification
+app.post('/api/auth/admin-login', (req, res) => {
+  const { pin } = req.body;
+  const ADMIN_PIN = process.env.ADMIN_PIN || '2026MM';
+  
+  if (pin && pin.toString().trim() === ADMIN_PIN) {
+    res.json({ success: true, message: 'Authorized' });
+  } else {
+    res.status(401).json({ error: 'Invalid PIN. Access denied.' });
+  }
+});
+
 // Endpoint: Admin fetch ALL whatsapp orders (for manage panel)
 app.get('/api/admin/whatsapp-orders', (req, res) => {
   const orders = getWhatsAppOrders();
@@ -470,39 +482,63 @@ app.get('/api/admin/whatsapp-orders', (req, res) => {
 
 // Endpoint: Admin log new WhatsApp order
 app.post('/api/whatsapp-order', (req, res) => {
-  const { customer_name, customer_phone, customer_email, customer_address, items, notes, receipt_filename } = req.body;
+  const { 
+    customer_name, 
+    customer_phone, 
+    fabric_name, 
+    date, 
+    total_price, 
+    status, 
+    carrier, 
+    tracking_number 
+  } = req.body;
 
-  if (!customer_name || !customer_phone || !items || items.length === 0) {
-    return res.status(400).json({ error: 'Missing name, phone or items' });
+  if (!customer_name || !customer_phone || !fabric_name || !total_price) {
+    return res.status(400).json({ error: 'Missing customer_name, customer_phone, fabric_name or total_price' });
   }
 
   const orders = getWhatsAppOrders();
-  
-  // Calculate total price
-  let total_price = 0;
-  items.forEach(it => {
-    total_price += parseFloat(it.price) * parseInt(it.quantity || 1);
-  });
+  const cleanPhone = normalizePhone(customer_phone);
 
   const newId = "WA-" + (orders.length > 0 ? (parseInt(orders[0].id.split('-')[1]) + 1) : 1001);
 
+  // Generate tracking URL if carrier and tracking number are supplied
+  let tracking_url = "";
+  if (tracking_number) {
+    const c = (carrier || "").toLowerCase();
+    if (c.includes('delhivery')) {
+      tracking_url = `https://www.delhivery.com/track/package/${tracking_number}`;
+    } else if (c.includes('shiprocket')) {
+      tracking_url = `https://www.shiprocket.in/shipment-tracking/${tracking_number}`;
+    } else {
+      tracking_url = `https://track.shiprocket.co/tracking/${tracking_number}`;
+    }
+  }
+
   const newOrder = {
     id: newId,
-    customer_name,
-    customer_phone,
-    customer_email: customer_email || "",
-    customer_address: customer_address || "",
-    date: new Date().toISOString(),
-    status: "pending",
-    total_price,
+    customer_name: customer_name.trim(),
+    customer_phone: cleanPhone,
+    customer_email: "",
+    customer_address: "WhatsApp Order - Managed by Admin",
+    date: date || new Date().toISOString(),
+    status: status || "pending",
+    total_price: parseFloat(total_price),
     source: "whatsapp",
-    items,
-    payment_status: receipt_filename ? "pending_approval" : "approved", // default prepaid approved if no receipt upload required
-    payment_receipt: receipt_filename || "",
-    carrier: "",
-    tracking_number: "",
-    tracking_url: "",
-    notes: notes || ""
+    items: [
+      {
+        title: fabric_name,
+        quantity: 1,
+        variant: "WhatsApp Entry",
+        price: parseFloat(total_price)
+      }
+    ],
+    payment_status: "approved",
+    payment_receipt: "",
+    carrier: carrier || "",
+    tracking_number: tracking_number || "",
+    tracking_url: tracking_url,
+    notes: "Logged via WhatsApp Order Entry Form"
   };
 
   // Prepend to show latest first

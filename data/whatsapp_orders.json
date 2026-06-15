@@ -1,5 +1,30 @@
 [
   {
+    "id": "WA-1003",
+    "customer_name": "Test Manager Order",
+    "customer_phone": "9000000000",
+    "customer_email": "",
+    "customer_address": "WhatsApp Order - Managed by Admin",
+    "date": "2026-06-16T10:30:00",
+    "status": "pending",
+    "total_price": 4800,
+    "source": "whatsapp",
+    "items": [
+      {
+        "title": "Wool Navy Blend (MM-22)",
+        "quantity": 1,
+        "variant": "WhatsApp Entry",
+        "price": 4800
+      }
+    ],
+    "payment_status": "approved",
+    "payment_receipt": "",
+    "carrier": "Delhivery",
+    "tracking_number": "DELH123456",
+    "tracking_url": "https://www.delhivery.com/track/package/DELH123456",
+    "notes": "Logged via WhatsApp Order Entry Form"
+  },
+  {
     "id": "WA-1002",
     "customer_name": "Rajesh Kumar",
     "customer_phone": "9876543210",

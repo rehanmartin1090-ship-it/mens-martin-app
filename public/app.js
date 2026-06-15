@@ -55,6 +55,20 @@ const el = {
   otpTimer: document.getElementById('otp-timer'),
   otpHintMessage: document.getElementById('otp-hint-message'),
   
+  // Admin PIN Elements
+  adminPinSection: document.getElementById('admin-pin-section'),
+  adminAccessPin: document.getElementById('admin-access-pin'),
+  btnVerifyAdminPin: document.getElementById('btn-verify-admin-pin'),
+  btnAdminBackToPhone: document.getElementById('btn-admin-back-to-phone'),
+  
+  // WhatsApp Order Entry Form Elements
+  adminFabricName: document.getElementById('admin-fabric-name'),
+  adminOrderDate: document.getElementById('admin-order-date'),
+  adminOrderAmount: document.getElementById('admin-order-amount'),
+  adminOrderStatus: document.getElementById('admin-order-status'),
+  adminCourierPartner: document.getElementById('admin-courier-partner'),
+  adminTrackingId: document.getElementById('admin-tracking-id'),
+  
   // Navigation & Profile
   menuItems: document.querySelectorAll('.menu-item'),
   tabPanels: document.querySelectorAll('.tab-panel'),
@@ -151,12 +165,14 @@ function registerServiceWorker() {
 
 // --- EVENT LISTENERS ---
 function setupEventListeners() {
-  // Login & OTP Buttons
+  // Login & OTP & Admin PIN Buttons
   el.btnLogin.addEventListener('click', handleSendOTP);
   el.btnVerifyOtp.addEventListener('click', handleVerifyOTP);
   el.btnBackToPhone.addEventListener('click', handleBackToPhone);
   el.btnResendOtp.addEventListener('click', handleResendOTP);
-  el.btnAdminToggle.addEventListener('click', handleAdminBypass);
+  el.btnAdminToggle.addEventListener('click', showAdminPinSection);
+  el.btnVerifyAdminPin.addEventListener('click', handleVerifyAdminPin);
+  el.btnAdminBackToPhone.addEventListener('click', handleAdminBackToPhone);
   el.btnLogout.addEventListener('click', handleLogout);
 
   // Sidebar Tabs Navigation
@@ -447,24 +463,67 @@ function startOtpCountdown() {
   }, 1000);
 }
 
-function handleAdminBypass() {
-  // Clear any active OTP timers
+function showAdminPinSection() {
   if (otpTimerInterval) clearInterval(otpTimerInterval);
-  handleBackToPhone();
+  el.phoneSection.style.display = 'none';
+  el.otpSection.style.display = 'none';
+  el.adminPinSection.style.display = 'block';
+  el.adminAccessPin.value = '';
+  el.adminAccessPin.focus();
+}
 
-  state.userPhone = "9999999999";
-  state.userName = "Brand Admin";
-  state.loyaltyTier = "Luxe Designer";
+async function handleVerifyAdminPin() {
+  const pin = el.adminAccessPin.value.trim();
+  if (pin.length === 0) {
+    alert("Please enter the Store Manager PIN.");
+    return;
+  }
 
-  el.loginContainer.classList.remove('active');
-  el.appContainer.classList.add('active');
-  el.adminMenuItem.classList.remove('hidden'); // Show admin tab
-  
-  const adminBtmNav = document.getElementById('admin-bottom-nav-item');
-  if (adminBtmNav) adminBtmNav.classList.remove('hidden'); // Show in mobile too
+  el.btnVerifyAdminPin.setAttribute('disabled', 'true');
+  el.btnVerifyAdminPin.textContent = 'Verifying...';
 
-  loadCustomerDashboard();
-  switchTab('admin');
+  try {
+    const res = await fetch('/api/auth/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin })
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      alert(data.error || 'Invalid PIN. Access denied.');
+      return;
+    }
+
+    // Success! Log as Admin
+    state.userPhone = "9999999999";
+    state.userName = "Brand Admin";
+    state.loyaltyTier = "Luxe Designer";
+
+    el.loginContainer.classList.remove('active');
+    el.appContainer.classList.add('active');
+    el.adminMenuItem.classList.remove('hidden'); // Show admin tab
+    
+    const adminBtmNav = document.getElementById('admin-bottom-nav-item');
+    if (adminBtmNav) adminBtmNav.classList.remove('hidden'); // Show in mobile too
+
+    handleAdminBackToPhone();
+    loadCustomerDashboard();
+    switchTab('admin');
+
+  } catch (err) {
+    console.error('Error verifying Admin PIN', err);
+    alert('Network error. Please try again.');
+  } finally {
+    el.btnVerifyAdminPin.removeAttribute('disabled');
+    el.btnVerifyAdminPin.innerHTML = '<span>Authorize & Login</span> <i class="fa-solid fa-key"></i>';
+  }
+}
+
+function handleAdminBackToPhone() {
+  el.adminPinSection.style.display = 'none';
+  el.phoneSection.style.display = 'block';
+  el.adminAccessPin.value = '';
 }
 
 function handleLogout() {
@@ -474,6 +533,7 @@ function handleLogout() {
   el.loginContainer.classList.add('active');
   el.loginPhone.value = '';
   handleBackToPhone();
+  handleAdminBackToPhone();
 }
 
 // --- PRODUCT SYNC & CATALOG RENDER ---
@@ -1022,6 +1082,7 @@ function submitReceiptImage() {
 
 // --- ADMIN MANAGEMENT PORTAL ---
 function populateAdminFabricSelect() {
+  if (!el.adminSelectFabric) return;
   el.adminSelectFabric.innerHTML = '';
   state.products.forEach(p => {
     const opt = document.createElement('option');
@@ -1031,24 +1092,35 @@ function populateAdminFabricSelect() {
     el.adminSelectFabric.appendChild(opt);
   });
   
-  // bind change listener to auto-update base price mockup
   el.adminSelectFabric.addEventListener('change', () => {
-    const baseVal = 580; // default suiting base
-    const multMap = { '1.2 meters': 1.2, '2 meters': 2, '3 meters': 3, '3.5 meters': 3.5 };
-    const factor = multMap[el.adminSelectLength.value] || 2.0;
-    el.adminCustomPrice.value = Math.round(baseVal * factor);
-  });
-  
-  el.adminSelectLength.addEventListener('change', () => {
     const baseVal = 580;
     const multMap = { '1.2 meters': 1.2, '2 meters': 2, '3 meters': 3, '3.5 meters': 3.5 };
     const factor = multMap[el.adminSelectLength.value] || 2.0;
     el.adminCustomPrice.value = Math.round(baseVal * factor);
   });
+  
+  if (el.adminSelectLength) {
+    el.adminSelectLength.addEventListener('change', () => {
+      const baseVal = 580;
+      const multMap = { '1.2 meters': 1.2, '2 meters': 2, '3 meters': 3, '3.5 meters': 3.5 };
+      const factor = multMap[el.adminSelectLength.value] || 2.0;
+      el.adminCustomPrice.value = Math.round(baseVal * factor);
+    });
+  }
+}
+
+function updateAdminOrderDateDefault() {
+  if (el.adminOrderDate) {
+    const now = new Date();
+    const offsetMs = now.getTimezoneOffset() * 60 * 1000;
+    const localISOTime = (new Date(now.getTime() - offsetMs)).toISOString().slice(0, 16);
+    el.adminOrderDate.value = localISOTime;
+  }
 }
 
 async function loadAdminConsole() {
   try {
+    updateAdminOrderDateDefault();
     const res = await fetch('/api/admin/whatsapp-orders');
     const data = await res.json();
     state.whatsappOrdersAll = data;
@@ -1069,7 +1141,6 @@ function renderAdminOrdersQueue() {
   state.whatsappOrdersAll.forEach(order => {
     const itemsText = order.items.map(i => `${i.title} (${i.variant})`).join(', ');
     
-    // Receipt upload preview button
     let receiptCol = 'Prepaid Approved';
     if (order.payment_receipt) {
       if (order.payment_status === 'approved') {
@@ -1082,7 +1153,6 @@ function renderAdminOrdersQueue() {
       }
     }
 
-    // Controls Column for status updating
     const controls = `
       <div class="admin-btn-action">
         <select class="select-table-carrier" id="carrier-${order.id}">
@@ -1155,41 +1225,48 @@ window.updateTrackingDirect = function(orderId) {
 function submitWhatsAppOrder() {
   const customer_name = el.adminCustName.value.trim();
   const customer_phone = el.adminCustPhone.value.trim();
-  const customer_email = el.adminCustEmail.value.trim();
-  const customer_address = el.adminCustAddress.value.trim();
-  const fabricTitle = el.adminSelectFabric.value;
-  const variant = el.adminSelectLength.value;
-  const price = parseFloat(el.adminCustomPrice.value);
-  const notes = el.adminOrderNotes.value.trim();
+  const fabric_name = el.adminFabricName.value.trim();
+  const date = el.adminOrderDate.value;
+  const total_price = parseFloat(el.adminOrderAmount.value);
+  const status = el.adminOrderStatus.value;
+  const carrier = el.adminCourierPartner.value.trim();
+  const tracking_number = el.adminTrackingId.value.trim();
 
-  if (!customer_name || !customer_phone || !customer_address) {
-    alert("Please fill name, phone and shipping address.");
+  if (!customer_name || !customer_phone || !fabric_name || isNaN(total_price)) {
+    alert("Please fill out Customer Name, Phone Number, Fabric Name, and Total Order Amount.");
     return;
   }
 
-  const items = [{
-    title: fabricTitle,
-    quantity: 1,
-    variant: variant,
-    price: price
-  }];
+  const payload = {
+    customer_name,
+    customer_phone,
+    fabric_name,
+    date,
+    total_price,
+    status,
+    carrier,
+    tracking_number
+  };
 
   fetch('/api/whatsapp-order', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      customer_name, customer_phone, customer_email, customer_address, items, notes
-    })
+    body: JSON.stringify(payload)
   })
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      alert(`Order ${data.order.id} logged successfully!`);
+      alert(`WhatsApp Order ${data.order.id} submitted successfully!`);
       el.adminOrderForm.reset();
-      el.adminSelectLength.value = '2 meters';
-      el.adminCustomPrice.value = 1160;
+      updateAdminOrderDateDefault();
       loadAdminConsole();
+    } else {
+      alert("Error submitting order: " + data.error);
     }
+  })
+  .catch(err => {
+    console.error("WhatsApp order submission failed", err);
+    alert("Server error. Please try again.");
   });
 }
 
